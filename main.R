@@ -11,7 +11,7 @@ I = normalizing_constant(f)
 # 2
 allValuesPos <- function(vec) all(vec >= 0)
 verifyPositive <- function(fAux){
-  allValuesPos(fAux(-100:100))
+  allValuesPos(fAux(seq(-100, 100, 0.1)))
 }
 is_prob_density <- function(faux)
 {
