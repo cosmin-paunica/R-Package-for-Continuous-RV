@@ -17,7 +17,7 @@ is_prob_density <- function(faux)
 {
   if(!verifyPositive(faux))
     F
-  if (floor(integrate(faux, -Inf, Inf)$value) ==0)
+  if (round(integrate(faux, -Inf, Inf)$value, 4) == 1)
     T
   else
     F
