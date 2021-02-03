@@ -5,16 +5,17 @@ normConstant <- function(f) {
 }
 
 # 2
-allValuesPos <- function(vec) all(vec >= 0)
-
 verifyPositive <- function(fAux) {
-  allValuesPos(fAux(seq(-100, 100, 0.1)))
+  for (val in seq(-500, 500, 0.1)) {
+    if (fAux(val) < 0) F
+  }
+  T
 }
 
 isProbDensity <- function(faux) {
   if(!verifyPositive(faux))
     F
-  if (round(integrate(faux, -Inf, Inf)$value, 4) == 1)
+  if (round(integrate(Vectorize(faux), -Inf, Inf)$value, 4) == 1)
     T
   else
     F
@@ -36,7 +37,7 @@ expectedValue <- function(X) { # intoarce valoare medie a distributiei
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
   functionFromX<- attr(X,"pdf")
-  integrate(function(x){x*functionFromX(x)},-Inf,Inf)$value
+  integrate(Vectorize(function(x){x*functionFromX(x)}), -Inf, Inf)$value
 }
 
 varianceValue<-function(X) {
@@ -46,7 +47,7 @@ varianceValue<-function(X) {
   toVariance <- function(x) {
     (x^2)*functionFromX(x)
   }
-  integrate(toVariance,-Inf,Inf)$value - (expectedValue(X)^2)
+  integrate(Vectorize(toVariance), -Inf, Inf)$value - (expectedValue(X)^2)
 }
 
 moment <- function(X, k) {
@@ -76,7 +77,7 @@ meanOfFunction <- function(g, X){ # intoarce valoarea medie a lui g(X)
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
   functionFromX<- attr(X,"pdf")
-  integrate(function(x){x*g(functionFromX(x))},-Inf,Inf)$value
+  integrate(Vectorize(function(x){x*g(functionFromX(x))}), -Inf, Inf)$value
 }
 
 varianceOfFunction <- function(g,X){
@@ -86,12 +87,13 @@ varianceOfFunction <- function(g,X){
   toVariance <- function(x){
     (x^2)*g(functionFromX(x))
   }
-  integrate(toVariance,-Inf,Inf)$value - (expectedValue(X)^2)
+  integrate(Vectorize(toVariance), -Inf, Inf)$value - (expectedValue(X)^2)
 }
 
 # 7
 PCont<-function(X,a=-Inf,b){
   if(!class(X)=="CRV")
     stop("X is not a continuous random variable")
-  integrate(attr(X,"pdf"),a,b)
+  functionFromX = attr(X, "pdf")
+  integrate(Vectorize(functionFromX), a, b)
 }
