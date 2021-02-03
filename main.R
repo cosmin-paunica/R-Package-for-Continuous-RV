@@ -22,12 +22,12 @@ isProbDensity <- function(faux) {
 }
 
 #3
-CRV <- function(pdFuncion,type=1) {
+CRV <- function(pdFuncion) {
   if(!isProbDensity(pdFuncion))
     stop("function is not a probability density")
   object = pdFuncion
   attr(object,"pdf") = pdFuncion 
-  attr(object,"type")= type
+  #attr(object,"type")= type
   class(object)="CRV"
   return(object)
 }
@@ -36,16 +36,16 @@ CRV <- function(pdFuncion,type=1) {
 expectedValue <- function(X) { # intoarce valoare medie a distributiei
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
-  functionFromX<- attr(X,"pdf")
-  integrate(Vectorize(function(x){x*functionFromX(x)}), -Inf, Inf)$value
+  densityOfX <- attr(X,"pdf")
+  integrate(Vectorize(function(x){x*densityOfX(x)}), -Inf, Inf)$value
 }
 
 varianceValue<-function(X) {
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
-  functionFromX<- attr(X,"pdf")
+  densityOfX <- attr(X,"pdf")
   toVariance <- function(x) {
-    (x^2)*functionFromX(x)
+    (x^2)*densityOfX(x)
   }
   integrate(Vectorize(toVariance), -Inf, Inf)$value - (expectedValue(X)^2)
 }
@@ -57,7 +57,11 @@ moment <- function(X, k) {
   if (class(X) != "CRV") {
     stop("X nu este v.a. continua")
   }
-  meanOfFunction(function(x) {x**k}, X)
+  tryCatch({
+    meanOfFunction(function(x) {x**k}, X)
+  }, error = function(e) {
+    stop("Nu exista momentul de ordinul dat")
+  })
 }
 
 centeredMoment <- function(X, k) {
@@ -67,33 +71,47 @@ centeredMoment <- function(X, k) {
   if (class(X) != "CRV") {
     stop("X nu este v.a. continua")
   }
-  functionFromX <- attr(X,"pdf")
   E = expectedValue(X)
-  meanOfFunction(function(x) {(x-E)**k}, X)
+  tryCatch({
+    meanOfFunction(function(x) {(x-E)**k}, X)
+  }, error = function(e) {
+    stop("Nu exista momentul de ordinul dat")
+  })
 }
 
 # 6
 meanOfFunction <- function(g, X){ # intoarce valoarea medie a lui g(X)
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
-  functionFromX<- attr(X,"pdf")
-  integrate(Vectorize(function(x){x*g(functionFromX(x))}), -Inf, Inf)$value
+  densityOfX <- attr(X,"pdf")
+  integrate(Vectorize(function(x){x*g(densityOfX(x))}), -Inf, Inf)$value
 }
 
 varianceOfFunction <- function(g,X){
   if(class(X)!="CRV")
     stop("X is not a continuous random variable")
-  functionFromX<- attr(X,"pdf")
+  densityOfX <- attr(X,"pdf")
   toVariance <- function(x){
-    (x^2)*g(functionFromX(x))
+    (x^2)*g(densityOfX(x))
   }
   integrate(Vectorize(toVariance), -Inf, Inf)$value - (expectedValue(X)^2)
 }
 
 # 7
-PCont<-function(X,a=-Inf,b){
+PCont<-function(X,a,b){
   if(!class(X)=="CRV")
     stop("X is not a continuous random variable")
-  functionFromX = attr(X, "pdf")
-  integrate(Vectorize(functionFromX), a, b)
+  densityOfX = attr(X, "pdf")
+  integrate(Vectorize(densityOfX), a, b)
+}
+
+# 12
+CRVSum = function(X, Y) {
+  if(!class(X)=="CRV")
+    stop("X is not a continuous random variable")
+  densityOfX = attr(X, "pdf")
+  densityOfY = attr(Y, "pdf")
+  densityOfZ = function(x) {integrate(Vectorize(function(t) {densityOfX(x-t) * densityOfY(t)}), -Inf, Inf)}
+  Z = CRV(densityOfX)
+  return(Z)
 }
