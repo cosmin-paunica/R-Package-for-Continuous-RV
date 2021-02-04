@@ -32,6 +32,20 @@ CRV <- function(pdFuncion) {
   return(object)
 }
 
+# 4
+plotCRV <- function(repartitie, param, x1, x2) {
+  domeniu = seq(x1, x2, 0.001)
+  if (length(param) == 0) {
+    plot(domeniu, repartitie(domeniu), xlab="", ylab="")
+  } else if (length(param) == 1) {
+    plot(domeniu, repartitie(domeniu, param[1]), xlab="", ylab="")
+  } else if (length(param) == 2) {
+    plot(domeniu, repartitie(domeniu, param[1], param[2]), xlab="", ylab="")
+  } else if (length(param) == 3) {
+    plot(domeniu, repartitie(domeniu, param[1], param[2], param[3]), xlab="", ylab="")
+  }
+}
+
 # 5
 expectedValue <- function(X) { # intoarce valoare medie a distributiei
   if(class(X)!="CRV")
