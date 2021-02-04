@@ -109,9 +109,22 @@ PCont<-function(X,a,b){
 CRVSum = function(X, Y) {
   if(!class(X)=="CRV")
     stop("X is not a continuous random variable")
+  if(!class(Y)=="CRV")
+    stop("Y is not a continuous random variable")
   densityOfX = attr(X, "pdf")
   densityOfY = attr(Y, "pdf")
   densityOfZ = function(x) {integrate(Vectorize(function(t) {densityOfX(x-t) * densityOfY(t)}), -Inf, Inf)}
   Z = CRV(densityOfX)
   return(Z)
+}
+
+CRVDifference = function(X, Y) {
+  if(!class(X)=="CRV")
+    stop("X is not a continuous random variable")
+  if(!class(Y)=="CRV")
+    stop("Y is not a continuous random variable")
+  densityOfY = attr(Y, "pdf")
+  densityOfNegativeY = function(x) {densityOfY(-x)}
+  negativeY = CRV(densityOfNegativeY)
+  return(CRVSum(X, negativeY))
 }
